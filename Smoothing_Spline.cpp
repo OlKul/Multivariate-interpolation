@@ -1,34 +1,24 @@
-#include "mainwindow.h"
-#include "ui_mainwindow.h"
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_matrix.h>
 #include <gsl/gsl_linalg.h>
 #include <gsl/gsl_blas.h>
+
+
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <fstream>
 #include <vector>
 #include <string>
+
+
 double g(double m0, double m1, double f0, double f1, double u, double x2, double x3, double w);
-MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::MainWindow)
-{
-    ui->setupUi(this);
-}
-
-MainWindow::~MainWindow()
-{
-    delete ui;
-}
-
 double g(double m0, double m1, double f0, double f1, double u, double x2, double x3, double w)
 {
     return (m0*((x3-w)*(x3-w)*(x3-w)))/(6*u)+m1*((w-x2)*(w-x2)*(w-x2))/(6*u)+(f0-m0*u*u/6)*(x3-w)/u+(f1-m1*u*u/6)*(w-x2)/u;
 }
 
-void MainWindow::on_pushButton_clicked()
+int main()
 {
         int n=6;
         int l=7;
@@ -43,6 +33,7 @@ void MainWindow::on_pushButton_clicked()
         QFile Input_Y ("Input_Y.txt");
         QFile Input_P ("Input_P.txt");
         int i=0;
+        // Читаем данные из файлов
         if (!Input_X.open(QIODevice::ReadOnly | QIODevice::Text))
             return;
         QTextStream inX(&Input_X);
@@ -75,10 +66,13 @@ void MainWindow::on_pushButton_clicked()
             //qDebug() << p[i];
             i++;
         }
+    
+    
+    
         //Spline(x, y, p);
         int k = l;
         double h[k-1];
-
+        // Составляем матрицу X
         for (i=0; i<=k-2; i++)
         {
             h[i]=x[i+1]-x[i];
@@ -93,7 +87,7 @@ void MainWindow::on_pushButton_clicked()
         //gsl_vector_fprintf (stdout, X, "%g");
 
         /*!
-         * \brief Задаем Y
+         * \brief Задаем матрицу Y
          */
         gsl_vector  *Y = gsl_vector_alloc (k);
         for (i=0; i<=k-1;i++)
@@ -208,7 +202,6 @@ void MainWindow::on_pushButton_clicked()
          */
 
 
-
         double x2, x3, f0,f1,m0,m1;
         i=0;
         double w;
@@ -268,88 +261,5 @@ void MainWindow::on_pushButton_clicked()
         ui->widget->yAxis->setLabel("Y");
 
         ui->widget->replot();
-
-}
-
-
-void MainWindow::on_pushButton_2_clicked()
-{
-    QString fileName = QFileDialog::getSaveFileName(this,tr("Choose a filename to save under"),QString(),tr("PNG(*.png);;JPG(*.jpg);;PDF(*.pdf);;BMP(*.bmp);;All Files(*)"));
-       if(!fileName.isEmpty())
-       {
-           if(fileName.endsWith(".png", Qt::CaseInsensitive))
-           {
-               ui->widget->savePng(fileName);
-           }
-           else if(fileName.endsWith(".jpg", Qt::CaseInsensitive))
-           {
-               ui->widget->saveJpg(fileName);
-           }
-           else if(fileName.endsWith(".pdf", Qt::CaseInsensitive))
-           {
-               ui->widget->savePdf(fileName);
-           }
-           else if(fileName.endsWith(".bmp", Qt::CaseInsensitive))
-           {
-               ui->widget->saveBmp(fileName);
-           }
-           else
-           {
-               fileName += ".png";
-               ui->widget->savePng(fileName);
-           }
-       }
-}
-
-
-
-void MainWindow::on_pushButton_3_clicked()
-{
-
-        qApp->quit();
-
-}
-
-void MainWindow::on_pushButton_4_clicked()
-{
-    ui->widget->clearGraphs();
-}
-
-void MainWindow::on_pushButton_5_clicked()
-{
-        double a = -1;
-        double b =  1;
-        double h = 0.01;
-
-        int N=(b-a)/h + 2;
-        QVector<double> x(N), y(N);
-
-        int i=0;
-        for (double X=a; X<=b; X+=h)
-        {
-            x[i] = X;
-            y[i] = sin(X);
-            i++;
-        }
-
-        ui->widget->clearGraphs();
-        ui->widget->addGraph();
-        ui->widget->graph(0)->setData(x, y);
-        ui->widget->xAxis->setLabel("x");
-        ui->widget->yAxis->setLabel("y");
-        ui->widget->xAxis->setRange(a, b);
-        double minY = y[0], maxY = y[0];
-        for (int i=1; i<N; i++)
-        {
-            if (y[i]<minY) minY = y[i];
-            if (y[i]>maxY) maxY = y[i];
-        }
-        ui->widget->yAxis->setRange(minY, maxY);
-        ui->widget->replot();
-}
-
-void MainWindow::on_pushButton_6_clicked()
-{
-
 
 }
