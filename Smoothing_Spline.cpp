@@ -236,30 +236,4 @@ int main()
         fclose(Output_X);
         fclose(Output_Y);
 
-
-
-        ui->widget->clearGraphs();
-        ui->widget->addGraph();
-        ui->widget->graph(0)->setPen(QPen(Qt::blue));
-        //ui->widget->graph(0)->setBrush(QBrush(QColor(0, 0, 255, 20)));
-        ui->widget->addGraph();
-        ui->widget->graph(1)->setPen(QPen(Qt::red));
-        ui->widget->xAxis2->setVisible(true);
-        ui->widget->xAxis2->setTickLabels(false);
-        ui->widget->yAxis2->setVisible(true);
-        ui->widget->yAxis2->setTickLabels(false);
-        connect(ui->widget->xAxis, SIGNAL(rangeChanged(QCPRange)), ui->widget->xAxis2, SLOT(setRange(QCPRange)));
-        connect(ui->widget->yAxis, SIGNAL(rangeChanged(QCPRange)), ui->widget->yAxis2, SLOT(setRange(QCPRange)));
-        ui->widget->graph(0)->setData(X_Out, Y_Out);
-        ui->widget->graph(1)->setData(xv, yv);
-        ui->widget->graph(1)->setLineStyle(QCPGraph::lsNone);//убираем линии
-        ui->widget->graph(1)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 4));
-        ui->widget->graph(0)->rescaleAxes();
-        ui->widget->graph(1)->rescaleAxes(true);
-
-        ui->widget->xAxis->setLabel("X");
-        ui->widget->yAxis->setLabel("Y");
-
-        ui->widget->replot();
-
 }
