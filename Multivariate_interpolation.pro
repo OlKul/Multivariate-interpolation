@@ -16,12 +16,12 @@ HEADERS  += interpolationgraph.h \
 
 
 
-unix|win32: LIBS += -L$$PWD/../GnuWin32/lib/ -lgsl
+LIBS += -LC:\Qt\Projects\Multivariate_interpolation\GnuWin32\lib/ -lgsl
 
-INCLUDEPATH += $$PWD/../GnuWin32/include
-DEPENDPATH += $$PWD/../GnuWin32/include
+INCLUDEPATH += C:\Qt\Projects\Multivariate_interpolation\GnuWin32\include
+DEPENDPATH += C:\Qt\Projects\Multivariate_interpolation\GnuWin32\include
 
-unix|win32: LIBS += -L$$PWD/../GnuWin32/lib/ -lgslcblas
+LIBS += -LC:\Qt\Projects\Multivariate_interpolation\GnuWin32\lib/ -lgslcblas
 
-INCLUDEPATH += $$PWD/../GnuWin32/include
-DEPENDPATH += $$PWD/../GnuWin32/include
+INCLUDEPATH += C:\Qt\Projects\Multivariate_interpolation\GnuWin32\include
+DEPENDPATH += C:\Qt\Projects\Multivariate_interpolation\GnuWin32\include

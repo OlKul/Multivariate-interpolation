@@ -17,9 +17,14 @@
 #include <QtGui/QPainter>
 #include <QtGui/QScreen>
 
+
+
+
 double g(double m0, double m1, double f0, double f1, double u, double x2, double x3, double w);
 int main(int argc, char *argv[])
 {
+
+
     //! Создаем график и окно:
     QApplication app(argc, argv);
     Q3DSurface *graph = new Q3DSurface();
