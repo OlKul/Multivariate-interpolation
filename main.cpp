@@ -44,8 +44,8 @@ int main(int argc, char *argv[])
     container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     container->setFocusPolicy(Qt::StrongFocus);
 
-    //! Then we'll create horizontal and vertical layouts.
-    //!  We'll add the graph with the container and the vertical layout into the horizontal one:
+
+
     QWidget *widget = new QWidget;
     QHBoxLayout *hLayout = new QHBoxLayout(widget);
     QVBoxLayout *vLayout = new QVBoxLayout();
@@ -67,20 +67,25 @@ int main(int argc, char *argv[])
     modelVBox->addWidget(sqrtSinModelRB);
     modelGroupBox->setLayout(modelVBox);
 
+
     QGroupBox *selectionGroupBox = new QGroupBox(QStringLiteral("Selection Mode"));
 
+    /// Кнопка "No selection"
     QRadioButton *modeNoneRB = new QRadioButton(widget);
     modeNoneRB->setText(QStringLiteral("No selection"));
     modeNoneRB->setChecked(false);
 
+    /// Кнопка "Item"
     QRadioButton *modeItemRB = new QRadioButton(widget);
     modeItemRB->setText(QStringLiteral("Item"));
     modeItemRB->setChecked(false);
 
+    /// Кнопка "Row Slice"
     QRadioButton *modeSliceRowRB = new QRadioButton(widget);
     modeSliceRowRB->setText(QStringLiteral("Row Slice"));
     modeSliceRowRB->setChecked(false);
 
+    /// Кнопка "Column Slice"
     QRadioButton *modeSliceColumnRB = new QRadioButton(widget);
     modeSliceColumnRB->setText(QStringLiteral("Column Slice"));
     modeSliceColumnRB->setChecked(false);
