@@ -15,6 +15,7 @@ using namespace alglib;
 #include <QtDebug>
 #include <QTextStream>
 #include <QFile>
+#include <QFileDialog>
 using namespace QtDataVisualization;
 
 int sampleCountX=5;
@@ -34,10 +35,10 @@ InterpolationGraph::InterpolationGraph(Q3DSurface *surface)
     m_graph->setAxisZ(new QValue3DAxis);
 
 
-    m_sqrtSinProxy = new QSurfaceDataProxy();
-    m_sqrtSinSeries = new QSurface3DSeries(m_sqrtSinProxy);
+    m_BicubicSplineProxy = new QSurfaceDataProxy();
+    m_BicubicSplineSeries = new QSurface3DSeries(m_BicubicSplineProxy);
 
-    fillSqrtSinProxy();
+    fillBicubicSplineProxy();
 
 }
 
@@ -51,38 +52,68 @@ InterpolationGraph::~InterpolationGraph()
  * Функция считывает точки из файла, заполняет ими массивы, строит сплайн функции,
  * после чего строит их.
  */
-void InterpolationGraph::fillSqrtSinProxy()
+void InterpolationGraph::fillBicubicSplineProxy()
 {
 
-    qDebug() << "1234   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n";
+
     QVector <double> xQt, yQt,zQt;
-    QFile InputFile("C:\\Qt\\Projects\\Multivariate_interpolation\\Input.txt");
+    QString Input_X,Input_Y,Input_Z;
+    Input_X = QFileDialog::getOpenFileName(0,
+        tr("Open Input data of X"), "", tr("Text Files (*.txt)"));
+    Input_Y = QFileDialog::getOpenFileName(0,
+        tr("Open Input data of Y"), "", tr("Text Files (*.txt)"));
+    Input_Z = QFileDialog::getOpenFileName(0,
+        tr("Open Input data of Z"), "", tr("Text Files (*.txt)"));
+    QFile InputFile_X(Input_X),
+          InputFile_Y(Input_Y),
+          InputFile_Z(Input_Z);
     int i;
-    if (!InputFile.open(QIODevice::ReadOnly | QIODevice::Text))
+    if (!InputFile_X.open(QIODevice::ReadOnly | QIODevice::Text))
     {
-        qDebug() << "Can not open Input.txt\n";
+        qDebug() << "Can not open Input_X.txt\n";
+        return;
+    }
+    if (!InputFile_Y.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        qDebug() << "Can not open Input_Y.txt\n";
+        return;
+    }
+    if (!InputFile_Z.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        qDebug() << "Can not open Input_Z.txt\n";
         return;
     }
     qDebug() << "#1\n";
-    QTextStream inXY(&InputFile);
-    while (!inXY.atEnd()) {
+    QTextStream inX(&InputFile_X);
+    QTextStream inY(&InputFile_Y);
+    QTextStream inZ(&InputFile_Z);
+    while (!inX.atEnd()) {
         qDebug() << "#3\n";
-        QString line = inXY.readLine();
-        QStringList list = line.split(" ");
-        qDebug() << "#3.1" << list.size() << " " << list << "\n";
-        QString strX = list.at(0);
-        QString strY = list.at(1);
-        QString strZ = list.at(2);
+        QString line = inX.readLine();
+        qDebug() << "#3.1" << line << "\n";
         qDebug() << "#3.2\n";
-        //xQt.append(strX.toDouble());
-        //yQt.append(strY.toDouble());
-        //zQt.append(strZ.toDouble());
+        xQt.append(line.toDouble());
         qDebug() << "#3.3\n";
     }
+    while (!inY.atEnd()) {
+        qDebug() << "#3\n";
+        QString line = inY.readLine();
+        qDebug() << "#3.1" << line << "\n";
+        qDebug() << "#3.2\n";
+        yQt.append(line.toDouble());
+        qDebug() << "#3.3\n";
+    }
+    while (!inZ.atEnd()) {
+        qDebug() << "#3\n";
+        QString line = inZ.readLine();
+        qDebug() << "#3.1" << line << "\n";
+        qDebug() << "#3.2\n";
+        zQt.append(line.toDouble());
+        qDebug() << "#3.3\n";
+    }
+
     qDebug() << "#2\n";
-    xQt = {1, 2, 3};
-    yQt = {1, 2, 3};
-    zQt = {3.2, 2.5, 5.1, 4.4, 4.7, 3.6, 6.5, 5.8, 2.9};
+
     qDebug() << "#2.1\n";
     alglib::ae_int_t  xsizeAlglib=xQt.size();
     qDebug() << "#2.2\n";
@@ -130,25 +161,23 @@ void InterpolationGraph::fillSqrtSinProxy()
     qDebug() << "#3.1\n";
     QSurfaceDataArray *dataArray = new QSurfaceDataArray;
     dataArray->reserve(sampleCountZ);
-    double x2,y2,z2;
+
     qDebug() << "#3.2\n";
     sampleCountX=(xmax - xmin) / 0.01;
     sampleCountZ=(ymax - ymin) / 0.01;
     for ( i=0 ; i < sampleCountZ  ; i++) {
         QSurfaceDataRow *newRow = new QSurfaceDataRow(sampleCountX);
-        // Keep values within range bounds, since just adding step can cause minor drift due
-        // to the rounding errors.
-        y2 = ymin+i*0.01;
+
+
         float z3 = qMin(ymax, (i * stepZ + ymin));
         int index = 0;
         qDebug() << "#3.3\n";
         for (int j=0 ; j < sampleCountX  ; j++) {
-            x2 = xmin+j*0.01;
+
             qDebug() << "#3.4\n";
-            //z2 = spline2dcalc(s, x2, y2);
-            z2= x2*x2+y2*y2;
+
             float x3 = qMin(xmax, (j * stepX + xmin));
-            //float R = qSqrt(z3 * z3 + x3 * x3) + 0.01f;
+
             float y3 = spline2dcalc(s, x3, z3);
             //qDebug() << "#3.5 " << ((xmax - xmin) / 0.1) << " " << (*newRow).size() << " " << index << "\n";
             (*newRow)[index++].setPosition(QVector3D(x3, y3, z3));
@@ -157,17 +186,17 @@ void InterpolationGraph::fillSqrtSinProxy()
         *dataArray << newRow;
     }
     qDebug() << "#3.7\n" << xmax << ymax << zmax;
-    m_sqrtSinProxy->resetArray(dataArray);
+    m_BicubicSplineProxy->resetArray(dataArray);
 
 }
 
 /// Улучшение интерфеса
-void InterpolationGraph::enableSqrtSinModel(bool enable)
+void InterpolationGraph::enableBicubicSplineModel(bool enable)
 {
     if (enable) {
 
-        m_sqrtSinSeries->setDrawMode(QSurface3DSeries::DrawSurfaceAndWireframe);
-        m_sqrtSinSeries->setFlatShadingEnabled(true);
+        m_BicubicSplineSeries->setDrawMode(QSurface3DSeries::DrawSurfaceAndWireframe);
+        m_BicubicSplineSeries->setFlatShadingEnabled(true);
 
         m_graph->axisX()->setLabelFormat("%.2f X");
         m_graph->axisZ()->setLabelFormat("%.2f Y");
@@ -182,13 +211,13 @@ void InterpolationGraph::enableSqrtSinModel(bool enable)
         m_graph->axisY()->setLabelAutoRotation(90);
         m_graph->axisZ()->setLabelAutoRotation(30);
 
-        m_graph->addSeries(m_sqrtSinSeries);
+        m_graph->addSeries(m_BicubicSplineSeries);
         //!
 
         //! The example has four slider controls for adjusting
         //!  the min and max values for X and Z axis. When selecting
         //! the proxy these sliders are adjusted so that one step on the slider moves the range by one segment step:
-        // Reset range sliders for Sqrt&Sin
+
         m_rangeMinX = xmin;
         m_rangeMinZ = ymin;
         m_stepX = (xmax - xmin) / double(sampleCountX - 1);
